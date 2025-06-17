@@ -1,0 +1,10 @@
+model:
+  weights_dir: '/mnt/DATA2/dorin/res.cv.science.is.matching/effnet_tuning/checkpoints'
+  # weights_path: '/mnt/DATA2/dorin/res.cv.science.is.matching/effnet_tuning/checkpoints/NewEfficentNetB3.pth'
+  weights_path: '/mnt/DATA2/dorin/res.cv.science.is.matching/effnet_tuning/checkpoints/SiamNet_tunehead_900.pth'
+  # weights_path: '/mnt/DATA2/dorin/res.cv.science.is.matching/effnet_tuning/checkpoints/SiamNet_bigdata_tune_3.pth'
+  reinitialize_fc_layers: False
+  freeze_extractor_layers: True
+
+training:
+  device: 'cuda'

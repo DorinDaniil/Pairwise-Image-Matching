@@ -1,0 +1,38 @@
+experiment:
+  experiment_name: 'effnet_tune'
+
+training:
+  start_epoch: 0
+  num_epochs: 30
+  global_step: null
+  batch_size: 16
+  device: 'cuda'
+  num_workers: 24
+  checkpoint_interval: 5
+  train_encoder: true
+
+data:
+  tensorboard_logdir: '/mnt/DATA2/dorin/res.cv.science.is.matching/effnet_tuning/logs'
+
+model:
+  weights_path: '/mnt/DATA2/dorin/res.cv.science.is.matching/effnet_tuning/checkpoints/NewEfficentNetB3.pth'
+  weights_dir: '/mnt/DATA2/dorin/res.cv.science.is.matching/effnet_tuning/checkpoints'
+  reinitialize_fc_layers: False
+  freeze_extractor_layers: True
+
+optimizer:
+  lr: 0.00001
+  momentum: 0.9
+  weight_decay: 0.00001
+  save_state_dict_dir: '/mnt/DATA2/dorin/res.cv.science.is.matching/effnet_tuning/state_dicts'
+  load_state_dict_path: null
+
+scheduler:
+  milestones: [300000, 500000, 700000, 900000]
+  gamma: 0.2
+  save_state_dict_dir: '/mnt/DATA2/dorin/res.cv.science.is.matching/effnet_tuning/state_dicts'
+  load_state_dict_path: null
+
+regularizer:
+  margin: 0.5
+  lambda: 0.5

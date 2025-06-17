@@ -1,0 +1,13 @@
+torch==1.10.0+cu113
+torchvision==0.11.0+cu113
+Pillow==10.1.0
+scikit-learn==0.24.1
+tqdm==4.65.0
+numpy==1.23.4
+matplotlib==3.6.2
+seaborn==0.13.2
+pandas==2.0.3
+pyyaml==6.0.2
+opencv-python==4.7.0.72
+albumentations==1.1.0
+protobuf==3.20.*
