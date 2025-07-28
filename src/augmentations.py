@@ -1,9 +1,10 @@
 import torchvision.transforms as transforms
-from torchvision.transforms import functional
 import numpy as np
 import albumentations as A
-from PIL import Image
 import random
+import string
+from torchvision.transforms import functional
+from PIL import Image, ImageDraw, ImageFont
 
 class RandomCompose(object):
     """
@@ -28,6 +29,67 @@ class RandomCompose(object):
             if random.random() > self.p:
                 img = t(img)
         return img
+
+class AddTextOverlay(object):
+    def __init__(self, 
+                 font_size_range=(10, 50), 
+                 opacity_range=(0.4, 0.8),
+                 text_length_range=(5, 8),
+                 special_chars="©®™€$#№@"):
+        self.font_size_range = font_size_range
+        self.opacity_range = opacity_range
+        self.text_length_range = text_length_range
+        self.special_chars = special_chars
+        self.predefined_texts = ["© 2024", "Sample", "Confidential", "Draft", "TEST", "PRIVATE", "UNCLASSIFIED"]
+
+    def __call__(self, img):
+        if img.mode != 'RGBA':
+            img = img.convert('RGBA')
+        draw = ImageDraw.Draw(img)
+        
+        if random.random() < 0.5:
+            text = random.choice(self.predefined_texts)  # Вариант 1: готовая фраза
+        else:
+            # Вариант 2: генерируем случайный текст
+            chars = string.ascii_letters + string.digits + self.special_chars
+            text_length = random.randint(*self.text_length_range)
+            text = ''.join(random.choices(chars, k=text_length))
+        
+        color = random.choice([(255, 255, 255, 255), (0, 0, 0, 255)])
+        opacity = int(255 * random.uniform(*self.opacity_range))
+        fill_color = (color[0], color[1], color[2], opacity)
+        
+        font_size = random.randint(*self.font_size_range)
+        x = random.randint(10, max(10, img.width - 100))
+        y = random.randint(10, max(10, img.height - 50))
+        
+        draw.text((x, y), text, fill=fill_color)
+        return img.convert('RGB')
+
+class AddWatermark(object):
+    def __init__(self, opacity_range=(0.3, 0.7), size_ratio_range=(0.05, 0.2)):
+        self.opacity_range = opacity_range
+        self.size_ratio_range = size_ratio_range
+
+    def __call__(self, img):
+        # Создаем полупрозрачный "логотип" (можно заменить на реальный файл)
+        watermark = Image.new("RGBA", (50, 50), (255, 255, 255, 128))
+        opacity = random.uniform(*self.opacity_range)
+        watermark = watermark.resize((
+            int(img.width * random.uniform(*self.size_ratio_range)),
+            int(img.height * random.uniform(*self.size_ratio_range))
+        ))
+        watermark.putalpha(int(255 * opacity))
+        
+        # Случайная позиция (углы, центр)
+        pos = random.choice([
+            (10, 10),
+            (img.width - watermark.width - 10, 10),
+            (img.width // 2 - watermark.width // 2, img.height // 2 - watermark.height // 2)
+        ])
+        img = img.convert("RGBA")
+        img.paste(watermark, pos, watermark)
+        return img.convert("RGB")
 
 class CenterCrop(object):
     """
@@ -102,7 +164,7 @@ class RandomRotation90(object):
     """
     def __call__(self, img):
         angle = random.choice([90, 180, 270])
-        img = functional.rotate(img, angle)
+        img = functional.rotate(img, angle, expand=True)
         return img
 
 class Grayscale(object):
@@ -143,27 +205,20 @@ def get_augmentations():
     Returns:
         Tuple[RandomCompose, RandomCompose]: A tuple containing simple, and train transforms.
     """
-    # Used for both queries and targets in evaluation mode
-    basic_transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                             std=[0.229, 0.224, 0.225])
-    ])
-
     # Used for targets in train
     simple_transform = RandomCompose([
         transforms.RandomApply([transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.3)], p=0.4),
         Crop(size=2),
     ])
 
-    # Augmentations for queries in train (unlike basic_transform and simple_transform it returns a PIL image)
-    # if SimilarityDataset has use_augmentations=True
+    # Augmentations for queries in train
     train_transform = RandomCompose([
-        CenterCrop(sizes=[5, 10]),
+        AddWatermark(),
+        AddTextOverlay(),
+        CenterCrop(sizes=[3, 5, 10]),
         Crop(size=5),
         GaussianNoise(),
-        transforms.RandomApply([transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.3)], p=0.8),
+        transforms.RandomApply([transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.3)], p=1.),
         GaussianBlur(kernel_sizes=[3, 5]),
         Scale(),
         RandomRotation90(),
