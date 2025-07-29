@@ -3,7 +3,7 @@ import os
 import random
 import numpy as np
 from PIL import Image
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from sklearn.model_selection import train_test_split
 
@@ -28,11 +28,11 @@ class CocoDataset(Dataset):
         self.preprocessor = preprocessor
         self.split = split
         self.val_size = val_size
+        self.simple_transform, self.train_transform = get_augmentations()
         self.image_paths = []
 
-        # Шаг 1: Собрать ВСЕ изображения из всех подпапок COCO
         coco_dir = os.path.join(data_dir, 'coco2017', 'coco_images')
-        splits = ['train2017', 'val2017', 'test2017', 'unlabeled2017']  # все возможные
+        splits = ['train2017', 'val2017', 'test2017', 'unlabeled2017']
 
         for split_name in splits:
             split_dir = os.path.join(coco_dir, split_name)

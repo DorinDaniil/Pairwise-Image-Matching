@@ -6,7 +6,7 @@ from src.train import train_model
 
 
 def main():
-    root = "/home/jovyan/nkiselev/ddorin/project/Pairwise-Image-Matching/data/coco/coco_images"
+    data_dir = "/home/jovyan/nkiselev/ddorin/project/Pairwise-Image-Matching/data/coco/coco_images"
     config_path = "configs/train_config.yaml"
     train_config = load_config(config_path)
     
@@ -21,7 +21,7 @@ def main():
                          val_size=0.1, 
                          random_seed=42)
 
-    train_model(model, dataloaders['train'], dataloaders['test'], train_config, resume=False)
+    train_model(net, dataloaders['train'], dataloaders['test'], train_config, resume=False)
 
 
 if __name__ == "__main__":
