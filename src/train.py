@@ -90,7 +90,7 @@ def save_checkpoint(model, optimizer, scheduler, epoch, config):
         'optimizer_state_dict': optimizer.state_dict(),
         'scheduler_state_dict': scheduler.state_dict()
     }
-    checkpoint_path = os.path.join(config['model']['checkpoint_dir'], f'checkpoint_epoch_{epoch}.pth')
+    checkpoint_path = os.path.join(config['training']['checkpoint_dir'], f'checkpoint_epoch_{epoch}.pth')
     torch.save(checkpoint, checkpoint_path)
     print(f'Checkpoint saved at epoch {epoch}')
 
@@ -117,7 +117,7 @@ def train_model(model, train_loader, val_loader, config, resume=False):
 
     num_epochs = config['training']['num_epochs']
     device = torch.device(config['training']['device'])
-    heckpoint_interval = config['training']['checkpoint_interval']
+    checkpoint_interval = config['training']['checkpoint_interval']
     checkpoint_dir = config['training']['checkpoint_dir']
     writer = SummaryWriter(log_dir=config['data']['tensorboard_logdir'])
     os.makedirs(checkpoint_dir, exist_ok=True)

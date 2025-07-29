@@ -68,8 +68,8 @@ class CocoDataset(Dataset):
         image_path = self.image_paths[idx]
         image = Image.open(image_path).convert('RGB')
 
-        augmented1 = self.train_transform(image)
-        augmented2 = self.simple_transform(image)
+        augmented1 = self.train_transform(image).convert('RGB')
+        augmented2 = self.simple_transform(image).convert('RGB')
 
         tensor1 = self.preprocessor(augmented1)
         tensor2 = self.preprocessor(augmented2)
