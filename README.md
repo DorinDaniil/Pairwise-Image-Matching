@@ -1,4 +1,5 @@
 # Pairwise-Image-Matching
+![figure_1_page-0001](https://github.com/user-attachments/assets/1d035f65-e20c-41e5-95e7-bb089d96e6b7)
 
 This work addresses the critical problem of detecting near-duplicate images in scientific publications, particularly in medical and biological research. The core challenge is to determine whether two given images are:
 
@@ -28,6 +29,7 @@ The key difficulty lies in differentiating between:
 Unlike general image similarity tasks, our goal is not to measure visual resemblance, but to detect whether one image was specifically derived from another through manual transformations - a critical distinction for plagiarism detection in scientific contexts.
 
 ## Proposed Solution
+![figure_2_page-0001](https://github.com/user-attachments/assets/67dfe62a-b288-4756-aafc-d76cd31b309f)
 
 We implement a siamese neural network architecture with:
 - EfficientNet-B3 as the feature encoder
