@@ -1,41 +1,33 @@
 experiment:
-  experiment_name: 'effnet_tune'
+  experiment_name: 'matching'
 
 training:
   start_epoch: 0
   num_epochs: 300
-  global_step: null
   batch_size: 32
   device: 'cuda'
   num_workers: 2
   checkpoint_interval: 1
-  train_encoder: False
+  contrastive_regularizer: True
 
 data:
-  tensorboard_logdir: '/mnt/DATA2/dorin/res.cv.science.is.matching/effnet_tuning/logs'
+  tensorboard_logdir: '/logs'
 
 model:
-  weights_path: '/mnt/DATA2/dorin/res.cv.science.is.matching/effnet_tuning/checkpoints/NewEfficentNetB3.pth'
-  # weights_path: '/mnt/DATA2/dorin/res.cv.science.is.matching/effnet_tuning/checkpoints/SiamNet_tunehead_600.pth'
-  weights_dir: '/mnt/DATA2/dorin/res.cv.science.is.matching/effnet_tuning/checkpoints'
-  checkpoint_dir: '/mnt/DATA2/dorin/res.cv.science.is.matching/effnet_tuning/checkpoint_dir/bigdata_trainall_from600ep'
-  reinitialize_fc_layers: False
-  freeze_extractor_layers: True
+  initialization_weights_path: null
+  checkpoint_dir: '/checkpoint_dir/first_experiment'
+  use_advanced_head: True
+  freeze_encoder: True
 
 optimizer:
-  name: 'AdamW'  # Выберите 'SGD', 'Adam' или 'AdamW'
+  name: 'AdamW'  # Выберите 'Adam' или 'AdamW'
   lr: 0.0001
-  # momentum: 0.9  # Используется только для SGD
-  weight_decay: 0.00001 # 0.00001
-  betas: [0.9, 0.999]  # Используется только для Adam и AdamW
-  save_state_dict_dir: '/mnt/DATA2/dorin/res.cv.science.is.matching/effnet_tuning/state_dicts'
-  load_state_dict_path: null
+  weight_decay: 0.00001
+  betas: [0.9, 0.999]
 
 scheduler:
   milestones: [18000, 36000, 45000]
   gamma: 0.5
-  save_state_dict_dir: '/mnt/DATA2/dorin/res.cv.science.is.matching/effnet_tuning/state_dicts'
-  load_state_dict_path: null
 
 regularizer:
   margin: 0.5

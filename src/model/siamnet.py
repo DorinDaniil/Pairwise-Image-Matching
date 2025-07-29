@@ -27,7 +27,8 @@ class HeadModel(nn.Module):
             nn.Linear(feature_dim, feature_dim),
             nn.ReLU(inplace=True),
             nn.Dropout(dropout_rate),
-            nn.Linear(feature_dim, 1)
+            nn.Linear(feature_dim, 1),
+            nn.Sigmoid()
         )
     
     def forward(self, diff_embeddings):
@@ -51,8 +52,6 @@ class AdvancedHeadModel(nn.Module):
     The inputs should already be in the format:
     - diff_embeddings: [|emb1 - emb2|] for all pairs
     - product_embeddings: [emb1 * emb2] for all pairs
-    
-    Note: For training, use BCEWithLogitsLoss instead of manually applying sigmoid.
     """
     
     def __init__(self, feature_dim, dropout_rate=0.1):
@@ -209,23 +208,13 @@ class SiamNet(nn.Module):
 def get_siamnet(config):
     device = config['training']['device']
     model_name = config['model'].get('model_name', 'efficientnet')
-    net = SiamNet(model_name)
+    freeze_encoder = config['model'].get('freeze_encoder', True)
+    use_advanced_head = config['model'].get('use_advanced_head', True)
+    net = SiamNet(model_name, freeze_encoder, use_advanced_head)
 
-    if config['model']['weights_path']:
-        net.load_state_dict(torch.load(config['model']['weights_path']))
-        print(f"Loaded weights from {config['model']['weights_path']}")
-
-    if config['model']['reinitialize_fc_layers']:
-        net.head.fc1 = nn.Linear(net.head.fc1.in_features, net.head.fc1.out_features)
-        net.head.fc2 = nn.Linear(net.head.fc2.in_features, net.head.fc2.out_features)
-        print('Fully connected layers reinitialized')
-
-    if config['model']['freeze_extractor_layers']:
-        for param in net.encoder.parameters():
-            param.requires_grad = False
-        for param in net.head.parameters():
-            param.requires_grad = True
-        print('Feature extractor layers frozen')
+    if config['model']['initialization_weights_path']:
+        net.load_state_dict(torch.load(config['model']['initialization_weights_path']))
+        print(f"Loaded weights from {config['model']['initialization_weights_path']}")
 
     net = net.to(device)
     return net

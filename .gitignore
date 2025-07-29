@@ -194,5 +194,6 @@ cython_debug/
 .cursorindexingignore
 
 
-checkpoints/
+checkpoint_dir/
 coco_images/
+logs/
