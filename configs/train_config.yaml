@@ -5,7 +5,7 @@ training:
   start_epoch: 0
   num_epochs: 20
   batch_size: 32
-  device: 'cuda:1'
+  device: 'cpu'
   num_workers: 2
   checkpoint_interval: 1
   checkpoint_dir: '/home/jovyan/nkiselev/ddorin/project/Pairwise-Image-Matching/checkpoint_dir/first_experiment'
@@ -17,7 +17,7 @@ data:
 model:
   initialization_weights_path: null
   use_advanced_head: True
-  freeze_encoder: False
+  freeze_encoder: True
 
 optimizer:
   name: 'AdamW'  # Выберите 'Adam' или 'AdamW'

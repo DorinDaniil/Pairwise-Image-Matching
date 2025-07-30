@@ -265,6 +265,7 @@ def train_model(model, train_loader, val_loader, config, resume=False):
         writer.add_scalar('F1/Val', val_metrics['f1'], epoch)
         writer.add_scalar('Recall/Val', val_metrics['recall'], epoch)
         writer.add_scalar('Precision/Val', val_metrics['precision'], epoch)
+        writer.add_scalar('Learning Rate', current_lr, epoch)
 
         if (epoch + 1) % checkpoint_interval == 0:
             save_checkpoint(model, optimizer, scheduler, epoch + 1, config)
