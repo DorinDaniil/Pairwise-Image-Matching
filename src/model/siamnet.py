@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .encoders import EfficientNetB3Encoder, CLIPEncoder, ViTEncoder
+from .encoders import EfficientNetB3Encoder, CLIPEncoder, ViTEncoder, BarlowTwinsEncoder
 
 
 class HeadModel(nn.Module):
@@ -10,8 +10,6 @@ class HeadModel(nn.Module):
     
     This architecture is designed to work with pre-computed difference vectors between embeddings.
     The input should already be in the format [|emb1 - emb2|] for all pairs.
-    
-    Note: For training, use BCEWithLogitsLoss instead of manually applying sigmoid.
     """
     
     def __init__(self, feature_dim, dropout_rate=0.1):
@@ -111,7 +109,7 @@ class SiamNet(nn.Module):
     Siamese network with configurable encoder backbone.
     
     Args:
-        model_name (str): Type of encoder to use ('efficientnet' or 'clip')
+        model_name (str): Type of encoder to use ('efficientnet', 'vit', 'barlowtwins' or 'clip')
         freeze_encoder (bool): Whether to freeze encoder weights during training
         use_advanced_head (bool): Whether to use the advanced head with product features
     """
@@ -131,8 +129,12 @@ class SiamNet(nn.Module):
             self.encoder = ViTEncoder(
                 freeze=freeze_encoder
             )
+        elif model_name.lower() == 'barlowtwins':
+            self.encoder = BarlowTwinsEncoder(
+                freeze=freeze_encoder
+            )
         else:
-            raise ValueError(f"Unsupported model name: {model_name}. Choose 'efficientnet', 'vit' or 'clip'.")
+            raise ValueError(f"Unsupported model name: {model_name}. Choose 'efficientnet', 'barlowtwins', 'vit' or 'clip'.")
         
         self.use_advanced_head = use_advanced_head
         if use_advanced_head:

@@ -5,19 +5,19 @@ training:
   start_epoch: 0
   num_epochs: 15
   batch_size: 32
-  device: 'cuda:1'
+  device: 'cuda:3'
   num_workers: 2
   checkpoint_interval: 1
-  checkpoint_dir: '/home/jovyan/nkiselev/ddorin/project/Pairwise-Image-Matching/checkpoint_dir/vit_15ep_unfreeze'
+  checkpoint_dir: '/home/jovyan/nkiselev/ddorin/project/Pairwise-Image-Matching/checkpoint_dir/efficientnet_15ep_unfreeze_simplehead'
   contrastive_regularizer: True
 
 data:
-  tensorboard_logdir: '/home/jovyan/nkiselev/ddorin/project/Pairwise-Image-Matching/logs/vit_15ep_unfreeze'
+  tensorboard_logdir: '/home/jovyan/nkiselev/ddorin/project/Pairwise-Image-Matching/logs/efficientnet_15ep_unfreeze_simplehead'
 
 model:
-  model_name: 'vit'
+  model_name: 'efficientnet'
   initialization_weights_path: null
-  use_advanced_head: True
+  use_advanced_head: False
   freeze_encoder: False
 
 optimizer:

@@ -261,3 +261,101 @@ class ViTEncoder(nn.Module):
             torch.Tensor: Feature embeddings [batch, 1024]
         """
         return self.backbone(x)
+
+
+class BarlowTwinsEncoder(nn.Module):
+    """
+    Pure Barlow Twins encoder using ResNet50 backbone from Facebook Research implementation.
+    Returns 2048-dimensional features matching the standard ResNet50 output dimension.
+    
+    Standard preprocessing is built-in as an attribute:
+    encoder.preprocess  # Contains Resize(256) + CenterCrop(224) + Normalize
+    
+    Example usage:
+    # Apply preprocessing to PIL image
+    image_tensor = encoder.preprocess(pil_image)
+    
+    # Get features
+    features = encoder(image_tensor.unsqueeze(0))
+    
+    # Frozen encoder (for feature extraction)
+    encoder = BarlowTwinsEncoder(freeze=True)
+    
+    # Unfreeze last 2 ResNet layers for fine-tuning
+    encoder.unfreeze_last_layers(n_layers=2)
+    """
+    
+    def __init__(self, freeze=True):
+        """
+        Args:
+            freeze (bool): Freeze backbone weights (True by default)
+        """
+        super().__init__()
+        
+        # Load Barlow Twins pretrained ResNet50
+        self.backbone = torch.hub.load('facebookresearch/barlowtwins:main', 'resnet50')
+        # Remove projection head to get backbone features
+        self.backbone.fc = nn.Identity()
+        
+        self._set_trainable(freeze)
+        self.feature_dim = 2048  # ResNet50 feature dimension
+        self.preprocess = transforms.Compose([
+            transforms.Resize((256, 256)),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225]
+            )
+        ])
+
+    def _set_trainable(self, freeze):
+        """Configure layer trainability"""
+        for param in self.backbone.parameters():
+            param.requires_grad = not freeze
+
+    def unfreeze_last_layers(self, n_layers=2):
+        """
+        Unfreeze N last layers of the ResNet backbone
+        
+        Args:
+            n_layers (int): Number of last ResNet layers to unfreeze
+            
+        ResNet50 structure:
+        [conv1] -> [bn1] -> [relu] -> [maxpool] -> 
+        [layer1 (3 blocks)] -> [layer2 (4 blocks)] -> 
+        [layer3 (6 blocks)] -> [layer4 (3 blocks)] -> 
+        [avgpool] -> [flatten] -> [fc (projection head)]
+        
+        Note: We've removed the projection head (fc), so features come from avgpool output
+        """
+        # First freeze all layers
+        for param in self.backbone.parameters():
+            param.requires_grad = False
+        
+        # Define ResNet layers in reverse order (from deepest to shallowest)
+        resnet_layers = [
+            self.backbone.layer4,
+            self.backbone.layer3,
+            self.backbone.layer2,
+            self.backbone.layer1
+        ]
+        
+        # Unfreeze requested number of layers
+        layers_to_unfreeze = min(n_layers, len(resnet_layers))
+        for i in range(layers_to_unfreeze):
+            for param in resnet_layers[i].parameters():
+                param.requires_grad = True
+
+    def forward(self, x):
+        """
+        Forward pass through encoder
+        
+        Args:
+            x: Input tensor [batch, 3, H, W] (after standard preprocessing)
+               Must be 224x224 as per ResNet requirements
+            
+        Returns:
+            torch.Tensor: Feature embeddings [batch, 2048]
+        """
+        return self.backbone(x)

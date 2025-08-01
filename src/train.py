@@ -186,8 +186,6 @@ def train_model(model, train_loader, val_loader, config, resume=False):
         train_metrics = compute_metrics(train_metrics_sum)
         train_loss /= train_total
 
-        train_loss /= train_total
-
         # ---------------------
         # Валидация
         # ---------------------
