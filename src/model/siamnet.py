@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .encoders import EfficientNetB3Encoder, CLIPEncoder
+from .encoders import EfficientNetB3Encoder, CLIPEncoder, ViTEncoder
 
 
 class HeadModel(nn.Module):
@@ -127,8 +127,12 @@ class SiamNet(nn.Module):
             self.encoder = CLIPEncoder(
                 freeze=freeze_encoder
             )
+        elif model_name.lower() == 'vit':
+            self.encoder = ViTEncoder(
+                freeze=freeze_encoder
+            )
         else:
-            raise ValueError(f"Unsupported model name: {model_name}. Choose 'efficientnet' or 'clip'.")
+            raise ValueError(f"Unsupported model name: {model_name}. Choose 'efficientnet', 'vit' or 'clip'.")
         
         self.use_advanced_head = use_advanced_head
         if use_advanced_head:

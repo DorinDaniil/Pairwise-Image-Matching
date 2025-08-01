@@ -32,9 +32,9 @@ class RandomCompose(object):
 
 class AddTextOverlay(object):
     def __init__(self, 
-                 font_size_range=(10, 50), 
-                 opacity_range=(0.4, 0.8),
-                 text_length_range=(5, 8),
+                 font_size_range=(20, 200), 
+                 opacity_range=(0.4, 1.0),
+                 text_length_range=(5, 12),
                  special_chars="©®™€$#№@"):
         self.font_size_range = font_size_range
         self.opacity_range = opacity_range
@@ -50,7 +50,6 @@ class AddTextOverlay(object):
         if random.random() < 0.5:
             text = random.choice(self.predefined_texts)  # Вариант 1: готовая фраза
         else:
-            # Вариант 2: генерируем случайный текст
             chars = string.ascii_letters + string.digits + self.special_chars
             text_length = random.randint(*self.text_length_range)
             text = ''.join(random.choices(chars, k=text_length))
@@ -72,7 +71,6 @@ class AddWatermark(object):
         self.size_ratio_range = size_ratio_range
 
     def __call__(self, img):
-        # Создаем полупрозрачный "логотип" (можно заменить на реальный файл)
         watermark = Image.new("RGBA", (50, 50), (255, 255, 255, 128))
         opacity = random.uniform(*self.opacity_range)
         watermark = watermark.resize((
@@ -81,7 +79,6 @@ class AddWatermark(object):
         ))
         watermark.putalpha(int(255 * opacity))
         
-        # Случайная позиция (углы, центр)
         pos = random.choice([
             (10, 10),
             (img.width - watermark.width - 10, 10),
@@ -91,6 +88,36 @@ class AddWatermark(object):
         img.paste(watermark, pos, watermark)
         return img.convert("RGB")
 
+class AddColoredSquare(object):
+    def __init__(self,
+                 size_ratio_range=(0.1, 0.3),
+                 opacity_range=(0.7, 1.0)):
+        self.size_ratio_range = size_ratio_range
+        self.opacity_range = opacity_range
+
+    def __call__(self, img):
+        if img.mode != 'RGBA':
+            img = img.convert('RGBA')
+        draw = ImageDraw.Draw(img)
+
+        # Square dimensions
+        size_ratio = random.uniform(*self.size_ratio_range)
+        square_size = int(min(img.width, img.height) * size_ratio)
+
+        # Random position
+        x = random.randint(0, img.width - square_size)
+        y = random.randint(0, img.height - square_size)
+
+        # Random color with opacity
+        color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        opacity = int(255 * random.uniform(*self.opacity_range))
+        fill_color = (color[0], color[1], color[2], opacity)
+
+        # Draw square
+        draw.rectangle([x, y, x + square_size, y + square_size], fill=fill_color)
+
+        return img.convert('RGB')
+
 class CenterCrop(object):
     """
     Randomly crops the image from the center with a random size.
@@ -98,33 +125,31 @@ class CenterCrop(object):
     Args:
         sizes (List[float]): List of possible crop sizes.
     """
-    def __init__(self, sizes=[5, 10]):
-        self.sizes = sizes
+    def __init__(self):
+        pass
 
     def __call__(self, img):
-        crop = random.choice(self.sizes)
+        crop = random.uniform(1, 5)
         w, h = img.size
-        h = h * (1 - crop / 100)
-        w = w * (1 - crop / 100)
+        h = int(h * (1 - crop / 100))
+        w = int(w * (1 - crop / 100))
         img = functional.center_crop(img, [h, w])
         return img
 
 class Crop(object):
     """
     Randomly crops the image with a random size and position.
-
-    Args:
-        size (float): Maximum crop size as a percentage of the image dimensions.
     """
-    def __init__(self, size=5):
-        self.size = size
+    def __init__(self):
+        pass
 
     def __call__(self, img):
+        size = random.uniform(1, 10)
         w, h = img.size
-        left = random.randint(0, int(w * self.size / 100))
-        top = random.randint(0, int(h * self.size / 100))
-        width = random.randint(int(w * (1 - self.size / 100) - left), int(w - left - 1))
-        height = random.randint(int(h * (1 - self.size / 100) - top), int(h - top - 1))
+        left = random.randint(0, int(w * size / 100))
+        top = random.randint(0, int(h * size / 100))
+        width = random.randint(int(w * (1 - size / 100) - left), int(w - left - 1))
+        height = random.randint(int(h * (1 - size / 100) - top), int(h - top - 1))
         img = functional.crop(img, top=top, left=left, height=height, width=width)
         return img
 
@@ -151,11 +176,19 @@ class Scale(object):
         pass  # No need to initialize with a predefined list of scales
 
     def __call__(self, img):
-        scale = random.uniform(0.3, 2)  # Randomly choose a scale factor between 0.3 and 2
-        w, h = img.size
-        h = int(h * scale)
-        w = int(w * scale)
-        img = functional.resize(img, size=(h, w))
+        if random.random() > 0.2:
+            scale = random.uniform(0.3, 2)  # Randomly choose a scale factor between 0.3 and 2
+            w, h = img.size
+            h = int(h * scale)
+            w = int(w * scale)
+            img = functional.resize(img, size=(h, w))
+        else:
+            scale_h = random.uniform(0.3, 2)
+            scale_w = random.uniform(0.3, 2)
+            w, h = img.size
+            h = int(h * scale_h)
+            w = int(w * scale_w)
+            img = functional.resize(img, size=(h, w))
         return img
 
 class RandomRotation90(object):
@@ -164,7 +197,11 @@ class RandomRotation90(object):
     """
     def __call__(self, img):
         angle = random.choice([90, 180, 270])
-        img = functional.rotate(img, angle, expand=True)
+        
+        img = functional.rotate(
+            img, 
+            angle, 
+            expand=True)
         return img
 
 class Grayscale(object):
@@ -207,16 +244,20 @@ def get_augmentations():
     """
     # Used for targets in train
     simple_transform = RandomCompose([
+        AddWatermark(),
+        AddTextOverlay(),
+        Crop(),
         transforms.RandomApply([transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.3)], p=0.4),
-        Crop(size=2),
+        Scale(),
     ])
 
     # Augmentations for queries in train
     train_transform = RandomCompose([
         AddWatermark(),
+        AddColoredSquare(),
         AddTextOverlay(),
-        CenterCrop(sizes=[3, 5, 10]),
-        Crop(size=5),
+        CenterCrop(),
+        Crop(),
         GaussianNoise(),
         transforms.RandomApply([transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.3)], p=1.),
         GaussianBlur(kernel_sizes=[3, 5]),
