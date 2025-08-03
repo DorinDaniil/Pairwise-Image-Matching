@@ -229,14 +229,14 @@ class ViTEncoder(nn.Module):
             
         ViT-L/16 structure:
         [conv_proj] -> [class_token, pos_embedding] -> 
-        [transformer blocks (24 blocks)] -> [encoder_norm] -> [heads]
+        [transformer blocks (24 blocks)] -> [ln] -> [heads]
         """
         # First freeze all layers
         for param in self.backbone.parameters():
             param.requires_grad = False
         
         # 1. Unfreeze final layer norm
-        for param in self.backbone.encoder_norm.parameters():
+        for param in self.backbone.encoder.ln.parameters():
             param.requires_grad = True
         n_layers -= 1  # Count norm as 1 layer
         

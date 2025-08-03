@@ -112,8 +112,9 @@ class SiamNet(nn.Module):
         model_name (str): Type of encoder to use ('efficientnet', 'vit', 'barlowtwins' or 'clip')
         freeze_encoder (bool): Whether to freeze encoder weights during training
         use_advanced_head (bool): Whether to use the advanced head with product features
+        unfreeze_n_layers (int): Number of last layers to unfreeze
     """
-    def __init__(self, model_name='efficientnet', freeze_encoder=True, use_advanced_head=True):
+    def __init__(self, model_name='efficientnet', freeze_encoder=True, use_advanced_head=True, unfreeze_n_layers=None):
         super(SiamNet, self).__init__()
         
         # Initialize the appropriate encoder based on model_name
@@ -136,6 +137,9 @@ class SiamNet(nn.Module):
         else:
             raise ValueError(f"Unsupported model name: {model_name}. Choose 'efficientnet', 'barlowtwins', 'vit' or 'clip'.")
         
+        if not freeze_encoder and unfreeze_n_layers is not None:
+            self.encoder.unfreeze_last_layers(unfreeze_n_layers)
+
         self.use_advanced_head = use_advanced_head
         if use_advanced_head:
             self.head = AdvancedHeadModel(self.encoder.feature_dim)
@@ -216,7 +220,8 @@ def get_siamnet(config):
     model_name = config['model'].get('model_name', 'efficientnet')
     freeze_encoder = config['model'].get('freeze_encoder', True)
     use_advanced_head = config['model'].get('use_advanced_head', True)
-    net = SiamNet(model_name, freeze_encoder, use_advanced_head)
+    unfreeze_n_layers = config['model'].get('unfreeze_n_layers', None)
+    net = SiamNet(model_name, freeze_encoder, use_advanced_head, unfreeze_n_layers)
 
     if config['model']['initialization_weights_path']:
         net.load_state_dict(torch.load(config['model']['initialization_weights_path']))
