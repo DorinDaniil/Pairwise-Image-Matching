@@ -1,0 +1,4 @@
+dataset_path: 'Pairwise-Image-Matching/data/domainnet'
+model_config_path: 'Pairwise-Image-Matching/configs/train_config.yaml'
+output_metrics_path: 'Pairwise-Image-Matching/data/metrics/metrics.json'
+threshold: 0.5

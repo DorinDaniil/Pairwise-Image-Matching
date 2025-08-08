@@ -235,6 +235,34 @@ class GaussianNoise(object):
         img = Image.fromarray(noisy_img_array)
         return img
 
+class CombinedAugmentation(object):
+    """
+    Applies a combination of all augmentations with a given probability.
+    """
+    def __init__(self, p=0.5):
+        self.p = p
+        self.augmentations = [
+            AddWatermark(),
+            AddTextOverlay(),
+            AddColoredSquare(),
+            CenterCrop(),
+            Crop(),
+            GaussianNoise(),
+            transforms.RandomApply([transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.3)], p=1.0),
+            GaussianBlur(kernel_sizes=[3, 5]),
+            Scale(),
+            RandomRotation90(),
+            Grayscale(),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip()
+        ]
+
+    def __call__(self, img):
+        for aug in self.augmentations:
+            if random.random() < self.p:
+                img = aug(img)
+        return img
+
 def get_augmentations():
     """
     Returns a set of image transformations for different use cases.
@@ -269,3 +297,82 @@ def get_augmentations():
     ])
 
     return simple_transform, train_transform
+
+def get_validation_augmentations():
+    """
+    Returns a dictionary of image transformations for validation testing.
+    Each transformation is applied with 100% probability (no random skipping).
+    Uses the custom transformation classes from your script.
+    """
+    augmentations = {
+        # No augmentation
+        'no_augmentation': lambda x: x,
+        
+        # Individual augmentations from your script
+        'add_text_overlay': AddTextOverlay(),
+        'add_watermark': AddWatermark(),
+        'add_colored_square': AddColoredSquare(),
+        'center_crop': CenterCrop(),
+        'random_crop': Crop(),
+        'gaussian_blur': GaussianBlur(kernel_sizes=[3, 5]),
+        'scale': Scale(),
+        'rotate_90': lambda x: functional.rotate(x, 90, expand=True),
+        'rotate_180': lambda x: functional.rotate(x, 180, expand=True),
+        'rotate_270': lambda x: functional.rotate(x, 270, expand=True),
+        'grayscale': Grayscale(p=0.0),  # p=0.0 ensures it always applies
+        'horizontal_flip': transforms.RandomHorizontalFlip(p=1.0),
+        'vertical_flip': transforms.RandomVerticalFlip(p=1.0),
+        'diagonal_flip': transforms.Compose([
+            transforms.RandomHorizontalFlip(p=1.0),
+            lambda x: functional.rotate(x, 90, expand=True)
+        ]),
+        'anti_diagonal_flip': transforms.Compose([
+            transforms.RandomHorizontalFlip(p=1.0),
+            lambda x: functional.rotate(x, 270, expand=True)
+        ]),
+        'gaussian_noise': GaussianNoise(),
+        'color_jitter': transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.3),
+        
+        # Basic combinations
+        'geometric_watermark': transforms.Compose([
+            lambda x: functional.rotate(x, 90, expand=True),
+            AddWatermark()
+        ]),
+        
+        'text_overlay_watermark': transforms.Compose([
+            AddTextOverlay(),
+            AddWatermark()
+        ]),
+        
+        'geometric_text_overlay': transforms.Compose([
+            transforms.RandomHorizontalFlip(p=1.0),
+            AddTextOverlay()
+        ]),
+        
+        'color_geometric': transforms.Compose([
+            transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.3),
+            lambda x: functional.rotate(x, 90, expand=True)
+        ]),
+        
+        'all_overlays': transforms.Compose([
+            AddTextOverlay(),
+            AddWatermark(),
+            AddColoredSquare()
+        ]),
+        
+        'full_augmentation_set1': transforms.Compose([
+            lambda x: functional.rotate(x, 90, expand=True),
+            AddTextOverlay(),
+            GaussianBlur(kernel_sizes=[3, 5])
+        ]),
+        
+        'full_augmentation_set2': transforms.Compose([
+            AddWatermark(),
+            GaussianNoise(),
+            Grayscale(p=0.0)
+        ]),
+
+        'combined_augmentation': CombinedAugmentation(p=0.5)
+    }
+    
+    return augmentations

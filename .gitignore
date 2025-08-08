@@ -197,5 +197,7 @@ cython_debug/
 checkpoint_dir/
 coco_images/
 logs/
-bio/
-cats/
+fpr_benchmark/
+bio_benchmark/
+domainnet/
+metrics/

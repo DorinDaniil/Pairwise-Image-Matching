@@ -3,32 +3,33 @@ experiment:
 
 training:
   start_epoch: 0
-  num_epochs: 30
+  num_epochs: 15
   batch_size: 32
-  device: 'cuda:2'
+  device: 'cuda'
   num_workers: 2
   checkpoint_interval: 1
-  checkpoint_dir: '/home/jovyan/nkiselev/ddorin/project/Pairwise-Image-Matching/checkpoint_dir/vit_15ep_unfreeze_5_layers_newscheduler'
+  checkpoint_dir: 'Pairwise-Image-Matching/checkpoint_dir/effnet'
   contrastive_regularizer: True
 
 data:
-  tensorboard_logdir: '/home/jovyan/nkiselev/ddorin/project/Pairwise-Image-Matching/logs/vit_15ep_unfreeze_5_layers_newscheduler'
+  tensorboard_logdir: 'Pairwise-Image-Matching/logs/effnet'
 
 model:
   model_name: 'vit'
-  initialization_weights_path: null
+  initialization_weights_path: 'Pairwise-Image-Matching/checkpoint_dir/vit_30ep_unfreeze_newscheduler/vit_30ep_unfreeze_newscheduler.pth'
+  # initialization_weights_path: null
   use_advanced_head: True
   freeze_encoder: False
-  unfreeze_n_layers: 5
+  unfreeze_n_layers: null
 
 optimizer:
-  name: 'AdamW'  # Выберите 'Adam' или 'AdamW'
+  name: 'AdamW'  # 'Adam' or 'AdamW'
   lr: 0.001
   weight_decay: 0.01
   betas: [0.9, 0.999]
 
 scheduler:
-  milestones: [10, 20] # [5, 10]
+  milestones: [5, 10] # [10, 20]
   gamma: 0.5
 
 regularizer:

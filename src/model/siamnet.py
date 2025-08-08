@@ -116,7 +116,7 @@ class SiamNet(nn.Module):
     """
     def __init__(self, model_name='efficientnet', freeze_encoder=True, use_advanced_head=True, unfreeze_n_layers=None):
         super(SiamNet, self).__init__()
-        
+
         # Initialize the appropriate encoder based on model_name
         if model_name.lower() == 'efficientnet':
             self.encoder = EfficientNetB3Encoder(
@@ -136,7 +136,7 @@ class SiamNet(nn.Module):
             )
         else:
             raise ValueError(f"Unsupported model name: {model_name}. Choose 'efficientnet', 'barlowtwins', 'vit' or 'clip'.")
-        
+
         if not freeze_encoder and unfreeze_n_layers is not None:
             self.encoder.unfreeze_last_layers(unfreeze_n_layers)
 
@@ -149,11 +149,11 @@ class SiamNet(nn.Module):
     def forward(self, batch1: torch.Tensor, batch2: torch.Tensor) -> torch.Tensor:
         """
         Forward pass through the siamese network.
-        
+
         Args:
             batch1: First batch of images [batch_size, channels, height, width]
             batch2: Second batch of images [batch_size, channels, height, width]
-            
+
         Returns:
             torch.Tensor: Similarity matrix [batch_size1, batch_size2]
         """
@@ -209,6 +209,32 @@ class SiamNet(nn.Module):
         if self.use_advanced_head:
             raise ValueError("This model was initialized with an advanced head that requires product embeddings")
         return self.head(diff_embeddings)
+
+    def predict_similarity(self, batch1: torch.Tensor, batch2: torch.Tensor) -> torch.Tensor:
+        """
+        Predict similarity between two batches of images.
+
+        Args:
+            batch1: First batch of images [batch_size, channels, height, width]
+            batch2: Second batch of images [batch_size, channels, height, width]
+
+        Returns:
+            torch.Tensor: Similarity vector [batch_size, 1]
+        """
+        emb1 = self.encoder(batch1)
+        emb2 = self.encoder(batch2)
+
+        # Pre-compute the difference and product vectors
+        diff_embeddings = torch.abs(emb1 - emb2)
+        product_embeddings = emb1 * emb2
+
+        # Pass pre-computed features to the head
+        if self.use_advanced_head:
+            logits = self.head(diff_embeddings, product_embeddings)
+        else:
+            logits = self.head(diff_embeddings)
+
+        return logits.view(-1)
     
     def get_preprocessing(self):
         """Returns the preprocessing pipeline for the encoder"""

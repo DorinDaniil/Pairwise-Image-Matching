@@ -1,0 +1,4 @@
+dataset_path: 'Pairwise-Image-Matching/data/fpr_benchmark'
+model_config_path: 'Pairwise-Image-Matching/configs/train_config.yaml'
+output_metrics_path: 'Pairwise-Image-Matching/data/metrics/fpr_metrics.json'
+threshold: 0.5
