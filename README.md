@@ -1,4 +1,4 @@
-# Pairwise-Image-Matching
+# Pairwise Image Matching for Plagiarism Detection
 This work addresses the critical problem of detecting near-duplicate images in scientific publications, particularly in medical and biological research. The core challenge is to determine whether two given images are:
 
 ![figure_1 (4)_page-0001](https://github.com/user-attachments/assets/ce5a7d89-54b0-4eb0-82b3-42000f77de57)
