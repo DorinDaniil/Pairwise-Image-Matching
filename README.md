@@ -33,9 +33,9 @@ Unlike general image similarity tasks, our goal is not to measure visual resembl
 
 We implement a Siamese neural network architecture with:
 
-Various encoders including EfficientNet-B3, ViT-L/16, CLIP ViT-H/14, and a Barlow Twins encoder using a ResNet50 backbone. Some encoders are kept frozen to compare representations obtained from our training with their contrastive encoders.
-A fusion module that employs a symmetric function to ensure invariance to input order, crucial for a stable scoring function.
-A classification head that predicts the probability of a near-duplicate relationship, implemented as a Multi-Layer Perceptron (MLP) with a single hidden layer, followed by ReLU activation and dropout for regularization, concluding with a sigmoid function to yield a similarity score.
+- Various encoders including EfficientNet-B3, ViT-L/16, CLIP ViT-H/14, and a Barlow Twins encoder using a ResNet50 backbone. Some encoders are kept frozen to compare representations obtained from our training with their contrastive encoders.
+- A fusion module that employs a symmetric function to ensure invariance to input order, crucial for a stable scoring function.
+- A classification head that predicts the probability of a near-duplicate relationship, implemented as a Multi-Layer Perceptron (MLP) with a single hidden layer, followed by ReLU activation and dropout for regularization, concluding with a sigmoid function to yield a similarity score.
 
 The system outputs a similarity score representing the probability that the second image was derived from the first through manual manipulation, rather than simply sharing visual content.
 
