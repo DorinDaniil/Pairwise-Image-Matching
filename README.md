@@ -1,7 +1,17 @@
-# Pairwise Image Matching for Plagiarism Detection
-This work addresses the critical problem of detecting near-duplicate images in scientific publications, particularly in medical and biological research. The core challenge is to determine whether two given images are:
+<div align="center">
+<h1> Pairwise Image Matching for Plagiarism Detection </h1>
+
+[Daniil Dorin](https://github.com/DorinDaniil)<sup>1 :email:</sup>, [Kseniia Varlamova](https://github.com/varyxi)<sup>1</sup>, [Andrey Grabovoy](https://github.com/andriygav)<sup>1</sup>
+
+<sup>1</sup> Antiplagiat Company, Moscow, Russia
+
+<sup>:email:</sup> Corresponding author
 
 ![figure_1 (4)_page-0001](https://github.com/user-attachments/assets/ce5a7d89-54b0-4eb0-82b3-42000f77de57)
+
+</div>
+
+This work addresses the critical problem of detecting near-duplicate images in scientific publications, particularly in medical and biological research. The core challenge is to determine whether two given images are:
 
 
 - Near-duplicates: One image was derived from the other through manual transformations (true plagiarism), or
