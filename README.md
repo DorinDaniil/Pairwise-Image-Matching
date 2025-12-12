@@ -7,6 +7,8 @@
 
 <sup>:email:</sup> Corresponding author
 
+[📝 Paper](https://www.mathnet.ru/php/archive.phtml?wshow=paper&jrnid=danma&paperid=668&option_lang=rus), [</> Code](https://github.com/DorinDaniil/Pairwise-Image-Matching/tree/main/src)
+
 ![figure_1 (4)_page-0001](https://github.com/user-attachments/assets/ce5a7d89-54b0-4eb0-82b3-42000f77de57)
 
 </div>
