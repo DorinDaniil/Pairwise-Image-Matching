@@ -9,6 +9,7 @@
 
 [📝 Paper](https://www.mathnet.ru/php/archive.phtml?wshow=paper&jrnid=danma&paperid=668&option_lang=rus), [</> Code](https://github.com/DorinDaniil/Pairwise-Image-Matching/tree/main/src)
 
+
 ![figure_1 (4)_page-0001](https://github.com/user-attachments/assets/ce5a7d89-54b0-4eb0-82b3-42000f77de57)
 
 </div>
@@ -39,7 +40,7 @@ The key difficulty lies in differentiating between:
 
 Unlike general image similarity tasks, our goal is not to measure visual resemblance but to detect whether one image was specifically derived from another through manual transformations $-$ a critical distinction for plagiarism detection in scientific contexts.
 
-## Proposed Solution
+## 🔎 Proposed Solution
 
 ![figure_2 (3)_page-0001](https://github.com/user-attachments/assets/b044d67c-0011-4805-b5ed-a0c08cd917cd)
 
@@ -52,3 +53,16 @@ We implement a Siamese neural network architecture with:
 The system outputs a similarity score representing the probability that the second image was derived from the first through manual manipulation, rather than simply sharing visual content.
 
 This architecture allows us to effectively distinguish between near-duplicate and merely similar images, providing a robust solution for detecting plagiarism in scientific publications.
+
+## 📚 Citation
+```BibTeX
+@article{dorin2025pairwise,
+  title={Pairwise image matching for plagiarism detection},
+  author={Dorin, Daniil Dmitrievich and Varlamova, KD and Grabovoy, Andrey Valerievich},
+  journal={Doklady Rossijskoj Akademii Nauk. Mathematika, Informatika, Processy Upravlenia},
+  volume={527},
+  pages={68--83},
+  year={2025},
+  publisher={Russian Academy of Sciences}
+}
+```
